@@ -7,6 +7,14 @@ import io
 import re
 from groq import Groq
 
+# PDF Text Extraction Engine
+try:
+    import pypdf
+except ImportError:
+    import os
+    os.system('pip install pypdf')
+    import pypdf
+
 # ReportLab Layout & Presentation Engines
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, Image
@@ -208,9 +216,9 @@ def generate_compliance_matrix():
 # DYNAMIC FORMAT OPTIMIZATION ENGINE (GROQ PARSING PIPELINE)
 # =============================================================================
 def generate_custom_dpr_narrative(format_blueprint):
-    """Uses Groq AI to read the user-specified formatting/indexing layout, optimize
+    """Uses Groq AI to read the user-specified formatting/indexing layout from text or PDF,
 
-    it with external open-web intelligence context, and return structural paragraphs.
+    optimizes it using external open-source intelligence, and returns structural paragraphs.
     """
     if not groq_api_key:
         return None
@@ -218,28 +226,28 @@ def generate_custom_dpr_narrative(format_blueprint):
     try:
         client = Groq(api_key=groq_api_key)
         prompt = f"""
-        You are a senior institutional consultant specializing in dairy infrastructure projects.
-        The user has provided a custom layout format/index instructions for their Detailed Project Report (DPR):
-        \"\"\"{format_blueprint}\"\"\"
+        You are an elite institutional consultant specializing in mega-scale dairy processing infrastructures.
+        The user has provided a custom layout format schema / chapter index reference to mimic:
+        \"\"\"{format_blueprint[:6000]}\"\"\"
 
-        Based on these specific system parameters:
+        Based on these custom execution constraints:
         - Promoter Entity: {final_promoter}
         - Sourcing Location Corridor: {final_location}
         - Design Plant Limit: {final_capacity_llpd} Lakh Liters/Day (Current Operations: {final_actual_llpd} LLPD)
         - Targeted Product Matrix Lines: {', '.join(products)}
         - Project Capital Investment Scale: INR {final_capex_cr} Crores
 
-        Generate elaborative, highly detailed narrative chapters adhering EXACTLY to the user's provided index.
-        Incorporate structural references, industrial optimization standards, and search-optimized insights regarding modern dairy manufacturing.
+        Analyze the provided document blueprint format, index its chapters, and build out complete, elaborative narrative contents.
+        Optimize the draft using strategic industry standard intelligence from open online parameters.
         
         Format your response cleanly using markdown headings for each section like:
         ### Chapter Title Or Section Name
-        Followed by deep, multi-paragraph corporate narrative drafts. Do not include summary intros or chat pleasantries.
+        Followed by deep, professional multi-paragraph corporate narrative drafts. Do not include chat intros, outbacks, or summary filler text.
         """
         response = client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
             model="llama-3.1-70b-versatile",
-            max_tokens=3000,
+            max_tokens=3500,
             temperature=0.2
         )
         return response.choices[0].message.content
@@ -288,7 +296,6 @@ def compile_comprehensive_pdf(custom_narrative_text=None):
     ]
     
     if custom_narrative_text:
-        # Dynamically find sections from custom text to include in index
         headings = re.findall(r'###\s*(.*)', custom_narrative_text)
         if headings:
             for h in headings:
@@ -330,7 +337,6 @@ def compile_comprehensive_pdf(custom_narrative_text=None):
     # NARRATIVE CONTENT GENERATION NODE
     # -------------------------------------------------------------------------
     if custom_narrative_text:
-        # Parse markdown response from Groq into ReportLab elements
         lines = custom_narrative_text.split('\n')
         for line in lines:
             line = line.strip()
@@ -467,16 +473,48 @@ with col_vis2:
 
 st.markdown("---")
 
-# User Input for Custom DPR Formats
-st.header("📋 DPR Report Format Optimization Lab")
-st.write("Customize your final document index or structure using open internet search-optimized intelligence context.")
+# =============================================================================
+# REVISED PDF INGESTION & FORMAT LAYOUT OPTIMIZATION LAB
+# =============================================================================
+st.header("📋 DPR Report Format Ingestion & Optimization Lab")
+st.write("Upload a target DPR template layout as a `.pdf` file. The engine will index the file layout structure and enrich it using open internet optimization insights.")
 
-user_format_input = st.text_area(
-    "Custom DPR Report Layout Format Instructions (Optional)",
-    placeholder="Example:\nChapter 1: Sourcing Dynamics\nChapter 2: Quality Testing Framework\nChapter 3: Cold Chain Logistics\n\nLeave empty to automatically apply the standard 16-chapter corporate template.",
-    height=150,
-    help="Paste custom chapter layout indices or specific template guidelines here to rewrite document chapter blocks via Groq AI."
+uploaded_format_pdf = st.file_uploader(
+    "Upload Reference DPR Format Template (.pdf)", 
+    type=["pdf"],
+    help="Upload a PDF of a project report format. The layout text will be automatically extracted, parsed, and mapped by the Groq AI engine."
 )
+
+user_text_format_input = st.text_area(
+    "Alternative Custom Chapter Notes / Index Layout (Optional Add-on)",
+    placeholder="Example:\nChapter 1: Sourcing Dynamics\nChapter 2: Quality Testing Framework...",
+    height=100,
+    help="Provide explicit text layout rules here if you aren't uploading a layout template PDF."
+)
+
+# Extract and combine text layouts from PDF file streams
+final_extracted_blueprint = ""
+if uploaded_format_pdf is not None:
+    try:
+        with st.spinner("Indexing and parsing layout from uploaded PDF file stream..."):
+            pdf_reader = pypdf.PdfReader(uploaded_format_pdf)
+            pdf_text_accumulator = []
+            for page_num, page in enumerate(pdf_reader.pages):
+                extracted_page_text = page.extract_text()
+                if extracted_page_text:
+                    pdf_text_accumulator.append(extracted_page_text)
+            
+            final_extracted_blueprint = "\n".join(pdf_text_accumulator)
+            if final_extracted_blueprint.strip() != "":
+                st.success(f"🎯 Reference PDF structure successfully parsed! Extracted {len(pdf_reader.pages)} pages of format layout.")
+            else:
+                st.warning("⚠️ Could not extract readable structural layout text from the PDF pages. Ensure the file contains text layers rather than flat pictures.")
+    except Exception as pdf_error:
+        st.error(f"Failed to read format blueprint PDF element structure: {pdf_error}")
+
+# Append text area input on top if available
+if user_text_format_input.strip() != "":
+    final_extracted_blueprint = f"{user_text_format_input}\n\n=== Extracted PDF Layout Context ===\n{final_extracted_blueprint}"
 
 st.markdown("---")
 
@@ -538,15 +576,17 @@ st.write("Compile all configuration parameters, financial matrices, and water-ne
 if st.button("Generate & Optimize Structural DPR Report Document"):
     with st.spinner("Executing structural index parsing, running Groq text generation nodes, and rendering vector components..."):
         
-        # Check if the process needs a custom format build or a standard bypass run
         optimized_narrative_layer = None
-        if user_format_input.strip() != "":
+        # Verify if template structures are present or trigger the structural layout bypass
+        if final_extracted_blueprint.strip() != "":
             if not groq_api_key:
-                st.error("🔒 Groq API Key required to process custom layout formats. Please insert an API key or clear the custom layout area to use the default corporate blueprint.")
+                st.error("🔒 Groq API Key required to process custom layout formats. Please insert an API key or clear the custom file uploads to utilize the default master blueprint.")
             else:
-                optimized_narrative_layer = generate_custom_dpr_narrative(user_format_input)
+                optimized_narrative_layer = generate_custom_dpr_narrative(final_extracted_blueprint)
+        else:
+            st.info("ℹ️ **Dynamic Layout Bypass Triggered:** No custom PDF blueprint layout index provided. Standard corporate master infrastructure template activated.")
         
-        # Generate the ReportLab PDF
+        # Generate the ReportLab PDF Document Stream
         generated_pdf_stream = compile_comprehensive_pdf(custom_narrative_text=optimized_narrative_layer)
         
         st.success("DPR Compilation Complete!")
