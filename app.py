@@ -75,14 +75,14 @@ actual_lpd = final_actual_llpd * 100000
 DWU_BENCHMARK = 3.31
 TWF_BENCHMARK = 9.0
 
-# Mathematical scaling indicators (FIXED: final_milk_kg typo resolved to final_annual_milk_kg)
+# Mathematical scaling indicators
 user_dwu = final_annual_water_l / final_annual_milk_kg if (final_annual_milk_kg > 0) else 3.31
 indirect_wf = (final_annual_elec_kwh * 56.9) / final_annual_milk_kg
 user_twf = user_dwu + (indirect_wf * 0.1)
 daily_effluent_lpd = (final_annual_water_l / 365) * 0.74
 capacity_utilization = (actual_lpd / capacity_lpd) * 100 if capacity_lpd > 0 else 85.0
 
-# FIXED: Explicit definition of the metric passbook dictionary to prevent downstream KeyError/NameError
+# Explicit definitions for baseline safety mapping
 metric_passbook = {
     'dwu_variance': user_dwu - DWU_BENCHMARK,
     'twf_variance': user_twf - TWF_BENCHMARK
@@ -140,39 +140,45 @@ for i, y in enumerate(years):
     dscr_projection.append(numerator / denominator if denominator > 0 else 1.5)
 
 # =============================================================================
-# ADVANCED STRUCTURAL GRAPHICS ENGINE
+# ADVANCED STRUCTURAL GRAPHICS ENGINE (FIXED BBOX DICTIONARY COUPLING)
 # =============================================================================
 def generate_advanced_topology(selected_products):
     fig, ax = plt.subplots(figsize=(12, 4.5))
     ax.axis('off')
     
+    # Styled Properties Mapped Safely into matplotlib bbox
     box_props = dict(boxstyle='round,pad=0.5', facecolor='#0F172A', edgecolor='#38BDF8', lw=1.5)
     w_props = dict(boxstyle='round,pad=0.5', facecolor='#1E293B', edgecolor='#F43F5E', lw=1.5)
     
-    ax.text(1, 3, "Bulk Silos Intake\n(100 LLPD Rated)", **box_props, color='white', ha='center', weight='bold')
-    ax.text(4, 3, "Clarification &\nBactofugation", **box_props, color='white', ha='center', weight='bold')
-    ax.text(7, 3, "High-Capacity\nPasteurization", **box_props, color='white', ha='center', weight='bold')
+    # Row 1: Core Dairy Refining Node Tracks (FIXED: dict assigned directly to bbox)
+    ax.text(1, 3, "Bulk Silos Intake\n(100 LLPD Rated)", bbox=box_props, color='white', ha='center', weight='bold')
+    ax.text(4, 3, "Clarification &\nBactofugation", bbox=box_props, color='white', ha='center', weight='bold')
+    ax.text(7, 3, "High-Capacity\nPasteurization", bbox=box_props, color='white', ha='center', weight='bold')
     
+    # Flow link elements Row 1
     ax.annotate('', xy=(2.3, 3), xytext=(1.8, 3), arrowprops=dict(arrowstyle="-|>", color='#38BDF8', lw=2))
     ax.annotate('', xy=(5.3, 3), xytext=(4.8, 3), arrowprops=dict(arrowstyle="-|>", color='#38BDF8', lw=2))
     
-    ax.text(10, 4, "Packaging Unit\n(Fluid Milk Lines)", **box_props, color='white', ha='center')
-    ax.text(10, 3, "Cheese & Paneer\nCoagulation Vats", **box_props, color='white', ha='center')
-    ax.text(10, 2, "By-Product Lines\n(Ghee / Mawa Pans)", **box_props, color='white', ha='center')
+    # Multi-product processing branches (FIXED: dict assigned directly to bbox)
+    ax.text(10, 4, "Packaging Unit\n(Fluid Milk Lines)", bbox=box_props, color='white', ha='center')
+    ax.text(10, 3, "Cheese & Paneer\nCoagulation Vats", bbox=box_props, color='white', ha='center')
+    ax.text(10, 2, "By-Product Lines\n(Ghee / Mawa Pans)", bbox=box_props, color='white', ha='center')
     
     ax.annotate('', xy=(8.5, 3.8), xytext=(7.8, 3.2), arrowprops=dict(arrowstyle="-|>", color='#0EA5E9', lw=1.5))
     ax.annotate('', xy=(8.5, 3.0), xytext=(7.8, 3.0), arrowprops=dict(arrowstyle="-|>", color='#0EA5E9', lw=1.5))
     ax.annotate('', xy=(8.5, 2.2), xytext=(7.8, 2.8), arrowprops=dict(arrowstyle="-|>", color='#0EA5E9', lw=1.5))
     
-    ax.text(4, 0.8, "Groundwater Intake\n(Empirical Sourcing)", **w_props, color='white', ha='center')
-    ax.text(7, 0.8, "K-Pack Systems CFS\nHigh-Fat Interceptor", **w_props, color='white', ha='center', weight='bold')
-    ax.text(10, 0.8, "Anaerobic Digester\n(Biological Secondary)", **w_props, color='white', ha='center')
+    # Row 2: Resource Water Infrastructure (FIXED: dict assigned directly to bbox)
+    ax.text(4, 0.8, "Groundwater Intake\n(Empirical Sourcing)", bbox=w_props, color='white', ha='center')
+    ax.text(7, 0.8, "K-Pack Systems CFS\nHigh-Fat Interceptor", bbox=w_props, color='white', ha='center', weight='bold')
+    ax.text(10, 0.8, "Anaerobic Digester\n(Biological Secondary)", bbox=w_props, color='white', ha='center')
     
     ax.annotate('', xy=(5.5, 0.8), xytext=(4.8, 0.8), arrowprops=dict(arrowstyle="-|>", color='#F43F5E', lw=2))
     ax.annotate('', xy=(8.5, 0.8), xytext=(7.8, 0.8), arrowprops=dict(arrowstyle="-|>", color='#F43F5E', lw=2))
     
+    # Inter-layer industrial link mapping (FIXED: lowercase fontsize applied)
     ax.annotate('Wastewater\nDischarge', xy=(4, 1.4), xytext=(4, 2.5),
-                arrowprops=dict(arrowstyle="->", color='#EF4444', lw=1.5, linestyle=':'), ha='center', color='#EF4444', fontSize=9)
+                arrowprops=dict(arrowstyle="->", color='#EF4444', lw=1.5, linestyle=':'), ha='center', color='#EF4444', fontsize=9)
     
     ax.set_xlim(-0.5, 12)
     ax.set_ylim(0, 4.8)
