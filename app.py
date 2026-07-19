@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
+import re
 from groq import Groq
 
 # ReportLab Layout & Presentation Engines
@@ -204,43 +205,61 @@ def generate_compliance_matrix():
     return fig
 
 # =============================================================================
-# INSTITUTIONAL COMPILATION ENGINE & ADVANCED PDF COMPILER
+# DYNAMIC FORMAT OPTIMIZATION ENGINE (GROQ PARSING PIPELINE)
 # =============================================================================
-def fetch_groq_optimized_layer():
-    """Utilizes Groq to build a search-optimized executive text layer tailored to user inputs."""
+def generate_custom_dpr_narrative(format_blueprint):
+    """Uses Groq AI to read the user-specified formatting/indexing layout, optimize
+
+    it with external open-web intelligence context, and return structural paragraphs.
+    """
     if not groq_api_key:
-        return "Standard industrial model optimization active. No API key provided for live dynamic text synthesis overrides."
+        return None
+        
     try:
         client = Groq(api_key=groq_api_key)
         prompt = f"""
-        Act as a Principal Infrastructure Consultant specialized in institutional dairy plants.
-        Generate a highly rigorous, technical executive framework statement for a processing plant with these specs:
-        - Promoter: {final_promoter}
-        - Location: {final_location}
-        - Capacity: {final_capacity_llpd} LLPD (Operational Target: {final_actual_llpd} LLPD)
-        - Selected Products: {', '.join(products)}
-        - Capex: INR {final_capex_cr} Crores
-        Provide exactly three long, dense paragraphs covering macro-economics, site competitive logistics advantages, and technology-driven margin protection systems.
+        You are a senior institutional consultant specializing in dairy infrastructure projects.
+        The user has provided a custom layout format/index instructions for their Detailed Project Report (DPR):
+        \"\"\"{format_blueprint}\"\"\"
+
+        Based on these specific system parameters:
+        - Promoter Entity: {final_promoter}
+        - Sourcing Location Corridor: {final_location}
+        - Design Plant Limit: {final_capacity_llpd} Lakh Liters/Day (Current Operations: {final_actual_llpd} LLPD)
+        - Targeted Product Matrix Lines: {', '.join(products)}
+        - Project Capital Investment Scale: INR {final_capex_cr} Crores
+
+        Generate elaborative, highly detailed narrative chapters adhering EXACTLY to the user's provided index.
+        Incorporate structural references, industrial optimization standards, and search-optimized insights regarding modern dairy manufacturing.
+        
+        Format your response cleanly using markdown headings for each section like:
+        ### Chapter Title Or Section Name
+        Followed by deep, multi-paragraph corporate narrative drafts. Do not include summary intros or chat pleasantries.
         """
         response = client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
             model="llama-3.1-70b-versatile",
-            max_tokens=1000
+            max_tokens=3000,
+            temperature=0.2
         )
         return response.choices[0].message.content
     except Exception as e:
-        return f"Optimization module active with default fallback conditions. Notice: {str(e)}"
+        st.warning(f"Groq Optimization Engine could not complete format indexing: {str(e)}. Activating localized corporate template engine...")
+        return None
 
-def compile_comprehensive_pdf():
+# =============================================================================
+# INSTITUTIONAL PDF GENERATION PROTOCOL
+# =============================================================================
+def compile_comprehensive_pdf(custom_narrative_text=None):
     pdf_buffer = io.BytesIO()
     document = SimpleDocTemplate(pdf_buffer, pagesize=letter, leftMargin=40, rightMargin=40, topMargin=50, bottomMargin=50)
     story = []
     
     styles = getSampleStyleSheet()
     
-    title_style = ParagraphStyle('CoverTitle', fontSize=26, leading=32, textColor=colors.HexColor('#0F172A'), alignment=1, spaceAfter=20, fontName="Helvetica-Bold")
-    subtitle_style = ParagraphStyle('CoverSub', fontSize=14, leading=18, textColor=colors.HexColor('#475569'), alignment=1, spaceAfter=180)
-    meta_style = ParagraphStyle('CoverMeta', fontSize=11, leading=16, textColor=colors.HexColor('#1E293B'), alignment=1)
+    title_style = ParagraphStyle('CoverTitle', fontSize=24, leading=30, textColor=colors.HexColor('#0F172A'), alignment=1, spaceAfter=15, fontName="Helvetica-Bold")
+    subtitle_style = ParagraphStyle('CoverSub', fontSize=13, leading=17, textColor=colors.HexColor('#475569'), alignment=1, spaceAfter=160)
+    meta_style = ParagraphStyle('CoverMeta', fontSize=10.5, leading=16, textColor=colors.HexColor('#1E293B'), alignment=1)
     
     h1_style = ParagraphStyle('H1Chapter', fontSize=14, leading=18, textColor=colors.HexColor('#1E3A8A'), spaceBefore=22, spaceAfter=12, fontName="Helvetica-Bold", keepWithNext=True)
     h2_style = ParagraphStyle('H2Section', fontSize=11, leading=15, textColor=colors.HexColor('#0284C7'), spaceBefore=14, spaceAfter=6, fontName="Helvetica-Bold", keepWithNext=True)
@@ -253,35 +272,51 @@ def compile_comprehensive_pdf():
     # -------------------------------------------------------------------------
     story.append(Spacer(1, 40))
     story.append(Paragraph("DETAILED PROJECT REPORT (DPR)", title_style))
-    story.append(Paragraph("STRATEGIC BLUEPRINT FOR A COMMERCIAL MEGA-SCALE DAIRY PLANT", ParagraphStyle('MainSub', fontSize=16, leading=22, textColor=colors.HexColor('#1E3A8A'), alignment=1, spaceAfter=15)))
+    story.append(Paragraph("STRATEGIC COMMERCIAL PROPOSAL & COMPLIANCE BLUEPRINT", ParagraphStyle('MainSub', fontSize=14, leading=20, textColor=colors.HexColor('#1E3A8A'), alignment=1, spaceAfter=15)))
     story.append(Paragraph(f"PRODUCTION PROFILE CAPACITY: {final_capacity_llpd} LAKH LITERS PER DAY", subtitle_style))
-    story.append(Paragraph(f"<b>Promoter Corporation:</b> {final_promoter}<br/><b>Operational Sourcing Nexus:</b> {final_location}<br/><b>Capital Investment Blueprint:</b> INR {final_capex_cr} Crores", meta_style))
+    story.append(Paragraph(f"<b>Promoter Enterprise:</b> {final_promoter}<br/><b>Operational Sourcing Corridor:</b> {final_location}<br/><b>Capital Investment Architecture:</b> INR {final_capex_cr} Crores", meta_style))
     story.append(PageBreak())
     
     # -------------------------------------------------------------------------
-    # SYSTEMATIC MASTER INDEX / TABLE OF CONTENTS
+    # INDEX CONTENT BLOCK
     # -------------------------------------------------------------------------
-    story.append(Paragraph("Master Structural Index", h1_style))
+    story.append(Paragraph("Master Document Blueprint Index", h1_style))
     story.append(Spacer(1, 10))
     
-    index_data = [
-        [Paragraph("<b>Chapter / Operational Section</b>", table_header), Paragraph("<b>Target Focus Area</b>", table_header)],
-        [Paragraph("Chapter 1: Executive Summary & Strategic Optimization", table_text), Paragraph("High-level project scope and Groq AI text insights.", table_text)],
-        [Paragraph("Chapter 2: Market Potential & Industry Structural Profile", table_text), Paragraph("Macro analysis of dairy processing supply chains in India.", table_text)],
-        [Paragraph("Chapter 3: Technical Specifications & Sizing Logic", table_text), Paragraph("Design parameters, mass balances, and capacity curves.", table_text)],
-        [Paragraph("Chapter 4: Supply Chain Logic & Raw Milk Procurement", table_text), Paragraph("Village-level aggregation and cold-chain infrastructure.", table_text)],
-        [Paragraph("Chapter 5: Project Location & Agro-Industrial Advantages", table_text), Paragraph("Geographical assessment and infrastructure access points.", table_text)],
-        [Paragraph("Chapter 6: Corporate Profile & Promoter Capabilities", table_text), Paragraph("Corporate background, operational track record, and values.", table_text)],
-        [Paragraph("Chapter 7: Capital Cost Architecture & Financial Viability", table_text), Paragraph("CAPEX allocation breakdown and breakdown profiles.", table_text)],
-        [Paragraph("Chapter 8: Operating Expenses & Annual Resource Outlays", table_text), Paragraph("Variable inputs, overheads, and annual raw costs.", table_text)],
-        [Paragraph("Chapter 9: Comprehensive 10-Year Profitability Statement", table_text), Paragraph("Revenue models, EBIDTA, PAT, and trend mapping.", table_text)],
-        [Paragraph("Chapter 10: Projected Balance Sheet Summaries", table_text), Paragraph("Asset structures, liability mapping, and equity tracking.", table_text)],
-        [Paragraph("Chapter 11: Capital Depreciation Framework", table_text), Paragraph("Written Down Value (WDV) structural schedules.", table_text)],
-        [Paragraph("Chapter 12: Debt Service Coverage & Solvency Metrics", table_text), Paragraph("DSCR, principal repayments, and interest obligations.", table_text)],
-        [Paragraph("Annexure A: Unit Engineering Topology Blueprint", table_text), Paragraph("Visual process flow visualization map.", table_text)],
-        [Paragraph("Annexure B: Cross-Sector Compliance & Sustainability Matrix", table_text), Paragraph("Environmental, economic, and benchmark performance metrics.", table_text)]
+    index_rows = [
+        [Paragraph("<b>Document Structural Section</b>", table_header), Paragraph("<b>Target Focus Area Matrix</b>", table_header)]
     ]
-    t_idx = Table(index_data, colWidths=[240, 280])
+    
+    if custom_narrative_text:
+        # Dynamically find sections from custom text to include in index
+        headings = re.findall(r'###\s*(.*)', custom_narrative_text)
+        if headings:
+            for h in headings:
+                index_rows.append([Paragraph(h, table_text), Paragraph("User-specified custom structured deployment module.", table_text)])
+        else:
+            index_rows.append([Paragraph("Custom Document Chapters", table_text), Paragraph("Optimized structural narrative text blocks.", table_text)])
+    else:
+        # Default Fallback Framework Index Data
+        default_sections = [
+            ("Chapter 1: Executive Summary & Technical Scope", "High-level summary overview of the processing facility."),
+            ("Chapter 2: Market Potential & Core Structural Profile", "Macro analysis of supply elasticities and nutritional consumption shifts."),
+            ("Chapter 3: Technical Facility Specifications & Sizing", "Engineering parameters, mass-balance, and pasteurization logic."),
+            ("Chapter 4: Supply Chain & Village Procurement Directives", "Cold-chain infrastructure and direct farming integration protocols."),
+            ("Chapter 5: Project Location Siting Analysis", "GIS-vetted logistics routing configurations and resource pathways."),
+            ("Chapter 6: Corporate Management & Operational Strategy", "Management experience profile and initialization milestones.")
+        ]
+        for title, desc in default_sections:
+            index_rows.append([Paragraph(title, table_text), Paragraph(desc, table_text)])
+            
+    # Common financial and annex indices
+    index_rows.extend([
+        [Paragraph("Chapter 7: Financial Viability - Cost & Means Architecture", table_text), Paragraph("Detailed CAPEX financing and debt/equity allocation layers.", table_text)],
+        [Paragraph("Chapter 8: Projected 10-Year Profitability Core Model", table_text), Paragraph("Comprehensive multi-variable revenue and profit statements.", table_text)],
+        [Paragraph("Annexure A: Unit Process Flow Engineering Topology Blueprint", table_text), Paragraph("Visual process matrix map from raw input to packaging.", table_text)],
+        [Paragraph("Annexure B: Cross-Sector Sustainability & Compliance Framework", table_text), Paragraph("Water footprints, effluent calculations, and benchmark indices.", table_text)]
+    ])
+    
+    t_idx = Table(index_rows, colWidths=[240, 280])
     t_idx.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0F172A')),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#CBD5E1')),
@@ -292,61 +327,48 @@ def compile_comprehensive_pdf():
     story.append(PageBreak())
     
     # -------------------------------------------------------------------------
-    # CHAPTER 1
+    # NARRATIVE CONTENT GENERATION NODE
     # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 1: Executive Summary & Strategic Optimization", h1_style))
-    story.append(Paragraph("This document outlines the corporate blueprint for the establishment of an automated, resource-efficient multi-product dairy processing terminal. The project is scaled intentionally to accommodate regional supply elasticity while optimizing margin defense mechanisms against seasonal raw milk supply drops. By deploying highly specialized processing machinery, the terminal guarantees compliance with international safety protocols while achieving significant unit-level cost reductions.", body_style))
-    
-    groq_text = fetch_groq_optimized_layer()
-    story.append(Paragraph("<b>Groq AI Search-Optimized Insights:</b>", h2_style))
-    story.append(Paragraph(groq_text, body_style))
-    story.append(PageBreak())
-    
-    # -------------------------------------------------------------------------
-    # CHAPTER 2
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 2: Market Potential & Industry Structural Profile", h1_style))
-    story.append(Paragraph("The dairy industry operates as a primary economic driver within the agricultural sector, exhibiting consistent compound annual growth rates driven by rising urban disposable incomes and expanding consumer preferences for functional nutrition. Traditional consumption models are transforming rapidly, moving away from unorganized fluid milk toward standardized, shelf-stable, value-added products.", body_style))
-    story.append(Paragraph("Furthermore, competitive pressures require modern processing hubs to integrate smart cold chains and flexible downstream processing equipment. This allows the factory floor to quickly pivot between packaging fluid retail milk and producing high-margin commodities like premium clarified butterfat, aged cheeses, and probiotic yogurts based on live market pricing data.", body_style))
-    story.append(PageBreak())
+    if custom_narrative_text:
+        # Parse markdown response from Groq into ReportLab elements
+        lines = custom_narrative_text.split('\n')
+        for line in lines:
+            line = line.strip()
+            if line.startswith('###'):
+                cleaned_title = line.replace('###', '').strip()
+                story.append(Paragraph(cleaned_title, h1_style))
+            elif line.startswith('##'):
+                cleaned_title = line.replace('##', '').strip()
+                story.append(Paragraph(cleaned_title, h2_style))
+            elif line:
+                story.append(Paragraph(line, body_style))
+        story.append(PageBreak())
+    else:
+        # --- Bypassed Fallback Default Chapter Text Modules ---
+        story.append(Paragraph("Chapter 1: Executive Summary & Technical Scope", h1_style))
+        story.append(Paragraph(f"This Detailed Project Report establishes the foundational operational parameters for a commercial mega-scale processing asset developed for {final_promoter}. The plant integrates automated high-capacity separation pipelines designed to protect system margins and provide seamless output flexibility.", body_style))
+        
+        story.append(Paragraph("Chapter 2: Market Potential & Core Structural Profile", h1_style))
+        story.append(Paragraph("The consumer ecosystem exhibits high compound growth parameters for structured dairy derivatives. Moving beyond raw liquid logistics, modern operations protect their revenue profiles by converting surplus liquid milk intakes into value-added commodities like premium clarified ghee, artisanal cheeses, and active probiotic yogurts.", body_style))
+        
+        story.append(Paragraph("Chapter 3: Technical Facility Specifications & Sizing", h1_style))
+        story.append(Paragraph(f"The facility is engineered around a core processing architecture rated at a maximum daily design capacity of {final_capacity_llpd} Lakh Liters. At a baseline capacity utilization of {capacity_utilization:.1f}%, the plant will sustain an input processing standard of {final_actual_llpd} Lakh Liters per operational cycle.", body_style))
+        
+        story.append(Paragraph("Chapter 4: Supply Chain & Village Procurement Directives", h1_style))
+        story.append(Paragraph("Raw logistics lines use automated collection terminals to test fat and solids-not-fat metrics instantly. Chilling centers drop fluid milk temperatures to below 4 degrees Celsius within 4 hours, preserving milk properties and protecting localized farming networks.", body_style))
+        
+        story.append(Paragraph("Chapter 5: Project Location Siting Analysis", h1_style))
+        story.append(Paragraph(f"The construction site inside <b>{final_location}</b> provides clear logistical access corridors to major metropolitan transit lines, ensuring efficient cross-state distribution of finished products.", body_style))
+        
+        story.append(Paragraph("Chapter 6: Corporate Management & Operational Strategy", h1_style))
+        story.append(Paragraph(f"<b>Executive Lead Sign:</b> {final_promoter}<br/><b>Vetted Core Competencies:</b> {final_exp}", body_style))
+        story.append(PageBreak())
 
     # -------------------------------------------------------------------------
-    # CHAPTER 3
+    # FIXED TECHNICAL FINANCIAL CHAPTERS (COMMON INFRASTRUCTURE ELEMENTS)
     # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 3: Technical Specifications & Sizing Logic", h1_style))
-    story.append(Paragraph(f"The facility is engineered with a core processing architecture rated at a daily peak design capacity of {final_capacity_llpd} Lakh Liters. Mass-balance optimization calculations indicate that at a baseline capacity utilization of {capacity_utilization:.1f}%, the plant will process a steady operational input of {final_actual_llpd} Lakh Liters per single production day.", body_style))
-    story.append(Paragraph("The processing line incorporates advanced technological modules, including high-speed hermetic separators, integrated bactofuges to eliminate heat-resistant spore loads, and regenerative pasteurizers operating at thermal exchange efficiencies exceeding 92%. Automated Clean-In-Place (CIP) systems reduce chemical handling overhead and minimize downtime during batch transfers.", body_style))
-    story.append(PageBreak())
-
-    # -------------------------------------------------------------------------
-    # CHAPTER 4
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 4: Supply Chain Logic & Raw Milk Procurement", h1_style))
-    story.append(Paragraph("Sustaining an industrial asset of this scale requires a reliable, continuous raw material procurement network. The facility implements a multi-tiered direct collection model that eliminates intermediary leakage and establishes direct financial inclusion with primary livestock smallholders.", body_style))
-    story.append(Paragraph("The network includes village-level pooling points equipped with solar-powered automatic milk collection units (AMCUs) that conduct instantaneous real-time quality testing for fat content and solids-not-fat (SNF). Collected volume is rapidly routed to bulk milk chilling centers (BMCs) to reduce temperatures to below 4°C within a strict 4-hour window, successfully preventing microbial development and preserving raw milk quality parameters.", body_style))
-    story.append(PageBreak())
-
-    # -------------------------------------------------------------------------
-    # CHAPTER 5
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 5: Project Location & Agro-Industrial Advantages", h1_style))
-    story.append(Paragraph(f"The selection of the primary construction site in the <b>{final_location}</b> was determined through a rigorous multi-criteria geographical information system (GIS) matrix. The location sits directly inside an established high-yield milkshed corridor, guaranteeing immediate physical access to high-quality raw milk sourcing networks.", body_style))
-    story.append(Paragraph("Proximity to major high-speed multi-lane transport infrastructure facilitates rapid long-haul distribution of finished retail products to urban distribution hubs. Additionally, the location provides reliable access to necessary industrial infrastructure, including high-capacity power lines, reliable natural gas connections, and sustainable industrial water supplies.", body_style))
-    story.append(PageBreak())
-
-    # -------------------------------------------------------------------------
-    # CHAPTER 6
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 6: Corporate Profile & Promoter Capabilities", h1_style))
-    story.append(Paragraph(f"The enterprise is led by <b>{final_promoter}</b>, an organization built upon extensive operational experience and industry-vetted technical capabilities. <i>Strategic Background Statement:</i> {final_exp}", body_style))
-    story.append(Paragraph("The core executive team includes industry veterans from dairy engineering, corporate finance, and commercial cold chain logistics. This diverse management capability ensures the enterprise can maintain strict cost controls during construction and hit targeted capacity utilization timelines within the first 12 months of operations.", body_style))
-    story.append(PageBreak())
-
-    # -------------------------------------------------------------------------
-    # CHAPTER 7
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 7: Capital Cost Architecture & Financial Viability", h1_style))
-    story.append(Paragraph("The total capital expenditure framework for this mega-scale dairy terminal is budgeted at a fixed allocation of INR <b>{final_capex_cr:.2f} Crores</b>. The investment distribution is strategically split to balance civil infrastructure longevity with advanced automation tooling systems.", body_style))
+    story.append(Paragraph("Chapter 7: Financial Viability - Cost & Means Architecture", h1_style))
+    story.append(Paragraph("The overall capital budget for this commercial dairy processing layout is configured at an institutional target scale of INR <b>{final_capex_cr:.2f} Crores</b>. The table below outlines asset allocations adjusted for automation systems.", body_style))
     
     fin_summary_matrix = [
         [Paragraph("Asset Structuring Description Block", table_header), Paragraph("Allocation (INR Crores)", table_header)],
@@ -368,34 +390,8 @@ def compile_comprehensive_pdf():
     story.append(t_fsm)
     story.append(PageBreak())
 
-    # -------------------------------------------------------------------------
-    # CHAPTER 8
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 8: Operating Expenses & Annual Resource Outlays", h1_style))
-    story.append(Paragraph("Operating expenditures are modeled using direct cost matrices that adjust for inflationary trends across raw materials, energy access fees, and specialized engineering labor. The table below represents the baseline Year 1 operating projections at target capacity constraints.", body_style))
-    
-    op_breakdown_matrix = [
-        [Paragraph("Operating Cost Vector Group (Year 1 Timeline)", table_header), Paragraph("Value Metric (INR)", table_header)],
-        [Paragraph("Raw Materials Procurement Input Expenses", table_text), Paragraph(f"{variable_cost_year_1:,.2f}", table_text)],
-        [Paragraph("Human Resources, Labor Allocation & Staff Overhead", table_text), Paragraph(f"{staff_cost_year_1:,.2f}", table_text)],
-        [Paragraph("Other Miscellaneous Administrative & Utility Expenses", table_text), Paragraph(f"{other_exp_year_1:,.2f}", table_text)],
-        [Paragraph("<b>Gross Annual Sales Realization Value</b>", table_text), Paragraph(f"<b>{revenue_year_1:,.2f}</b>", table_text)]
-    ]
-    t_obm = Table(op_breakdown_matrix, colWidths=[320, 200])
-    t_obm.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#0EA5E9')),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#CBD5E1')),
-        ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, colors.HexColor('#F8FAFC')]),
-        ('PADDING', (0,0), (-1,-1), 6)
-    ]))
-    story.append(t_obm)
-    story.append(PageBreak())
-
-    # -------------------------------------------------------------------------
-    # CHAPTER 9
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 9: Comprehensive 10-Year Profitability Statement", h1_style))
-    story.append(Paragraph("The long-term financial structure demonstrates strong profitability and compounding margin defense over the ten-year projection horizon. Revenue models assume a modest 5% annual price escalation, balancing market reality with long-term commercial optimization targets.", body_style))
+    story.append(Paragraph("Chapter 8: Projected 10-Year Profitability Core Model", h1_style))
+    story.append(Paragraph("The long-term financial architecture displays strong liquidity coverage ratios and compounding margin health across the ten-year projection timeline.", body_style))
     
     prof_headers = [Paragraph("Metric (Cr INR)", table_header)] + [Paragraph(f"Y{y}", table_header) for y in years]
     row_rev = [Paragraph("Gross Revenue", table_text)] + [Paragraph(f"{r/10000000:.1f}", table_text) for r in revenue_projection]
@@ -412,65 +408,12 @@ def compile_comprehensive_pdf():
     story.append(PageBreak())
 
     # -------------------------------------------------------------------------
-    # CHAPTER 10
+    # MANDATORY TECHNICAL ANNEXURES
     # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 10: Projected Balance Sheet Summaries", h1_style))
-    story.append(Paragraph("The company's balance sheet reflects a healthy capital structure, featuring rapid debt reduction and steady accumulation of corporate equity reserves over time. Retained earnings are re-invested into automated process upgrades to keep the plant operating at peak efficiency.", body_style))
-    
-    row_eq = [Paragraph("Total Equity Base", table_text)] + [Paragraph(f"{(equity_contribution + (sum(net_profit_projection[:i])*0.5))/10000000:.1f}", table_text) for i in range(1, 11)]
-    row_debt = [Paragraph("Outstanding Debt", table_text)] + [Paragraph(f"{(term_loan_principal - (annual_repayment*(y-1)))/10000000:.1f}", table_text) for y in years]
-    
-    t_bs = Table([prof_headers, row_eq, row_debt], colWidths=[110] + [41]*10)
-    t_bs.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#334155')),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
-        ('PADDING', (0,0), (-1,-1), 5)
-    ]))
-    story.append(t_bs)
-    story.append(PageBreak())
-
-    # -------------------------------------------------------------------------
-    # CHAPTER 11
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 11: Capital Depreciation Framework", h1_style))
-    story.append(Paragraph("Depreciation planning applies the standard Written Down Value (WDV) method at a 15% blending rate across primary processing assets and manufacturing plant machinery groups. This systematic methodology matches asset value changes with active plant lifecycles, optimizing corporate tax structures during high-growth operational years.", body_style))
-    
-    row_dep = [Paragraph("Depreciation Allocation", table_text)] + [Paragraph(f"{d/10000000:.1f}", table_text) for d in depreciation_schedule]
-    t_dep = Table([prof_headers, row_dep], colWidths=[110] + [41]*10)
-    t_dep.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#475569')),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
-        ('PADDING', (0,0), (-1,-1), 5)
-    ]))
-    story.append(t_dep)
-    story.append(PageBreak())
-
-    # -------------------------------------------------------------------------
-    # CHAPTER 12
-    # -------------------------------------------------------------------------
-    story.append(Paragraph("Chapter 12: Debt Service Coverage & Solvency Metrics", h1_style))
-    story.append(Paragraph("Debt service validation calculations show strong solvency safety margins. The project's Debt Service Coverage Ratio (DSCR) remains comfortably above institutional lending thresholds, confirming the plant's ability to reliably meet capital obligations even during seasonal market fluctuations.", body_style))
-    
-    row_int = [Paragraph("Interest Expense Pay", table_text)] + [Paragraph(f"{int_p/10000000:.1f}", table_text) for int_p in interest_payments]
-    row_dscr = [Paragraph("Calculated DSCR Index", table_text)] + [Paragraph(f"{dscr:.2f}", table_text) for dscr in dscr_projection]
-    
-    t_dc = Table([prof_headers, row_int, row_dscr], colWidths=[110] + [41]*10)
-    t_dc.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#1E3A8A')),
-        ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor('#E2E8F0')),
-        ('PADDING', (0,0), (-1,-1), 5)
-    ]))
-    story.append(t_dc)
-    story.append(PageBreak())
-
-    # =============================================================================
-    # TECHNICAL ANNEXURES (VISUAL BLUEPRINT & METRICS COUPLING)
-    # =============================================================================
-    story.append(Paragraph("Annexure A: Unit Engineering Topology Blueprint", h1_style))
-    story.append(Paragraph("This blueprint visualizes the automated processing sequence and resource routing layout designed for this facility, showing everything from initial fluid intake to downstream separation and integrated environmental treatment lines.", body_style))
+    story.append(Paragraph("Annexure A: Unit Process Flow Engineering Topology Blueprint", h1_style))
+    story.append(Paragraph("This chart maps out the sequence of equipment steps and resource paths configured for this processing facility, running from intake tanks to finished product packaging lines.", body_style))
     story.append(Spacer(1, 10))
     
-    # Save Topology Figure to Buffer for ReportLab insertion
     fig_topo = generate_advanced_topology(products)
     topo_buf = io.BytesIO()
     fig_topo.savefig(topo_buf, format='png', dpi=200)
@@ -479,11 +422,10 @@ def compile_comprehensive_pdf():
     story.append(Image(topo_buf, width=500, height=187))
     story.append(PageBreak())
     
-    story.append(Paragraph("Annexure B: Cross-Sector Compliance & Sustainability Matrix", h1_style))
-    story.append(Paragraph("The chart below maps the facility's sustainability performance indices against regional dairy sector benchmarks, tracking environmental impact, water footprint mitigation, and localized smallholder economic inclusion goals.", body_style))
+    story.append(Paragraph("Annexure B: Cross-Sector Sustainability & Compliance Framework", h1_style))
+    story.append(Paragraph("The layout evaluates the facility's sustainability performance indices against regional dairy benchmarks, tracking resource usage, water efficiency, and local community inclusion parameters.", body_style))
     story.append(Spacer(1, 10))
     
-    # Save Compliance Figure to Buffer for ReportLab insertion
     fig_comp = generate_compliance_matrix()
     comp_buf = io.BytesIO()
     fig_comp.savefig(comp_buf, format='png', dpi=200)
@@ -492,8 +434,7 @@ def compile_comprehensive_pdf():
     story.append(Image(comp_buf, width=480, height=182))
     story.append(Spacer(1, 15))
     
-    # Text-based indicators matrix
-    story.append(Paragraph("<b>Calculated Empirical Performance Summary:</b>", h2_style))
+    story.append(Paragraph("<b>Calculated Empirical Performance Key Metrics Summary:</b>", h2_style))
     story.append(Paragraph(f"• <b>Direct Water Use Ratio:</b> {user_dwu:.2f} L/kg of processed input raw milk (Target Regional Standard Benchmark: 3.31 L/kg)", body_style))
     story.append(Paragraph(f"• <b>Total Water Footprint Index:</b> {user_twf:.2f} L/kg total consumption footprint (Target Regional Standard Benchmark: 9.00 L/kg)", body_style))
     story.append(Paragraph(f"• <b>Daily Effluent Pre-Treatment Target Volume:</b> {daily_effluent_lpd:,.2f} Liters Per Day mapped to K-Pack System CFS standard operational layouts.", body_style))
@@ -523,6 +464,19 @@ with col_vis2:
               delta=f"{metric_passbook['dwu_variance']:.2f} L/kg vs Benchmark Standard (3.31)", delta_color="inverse")
     st.metric(label="Total Water Footprint (TWF)", value=f"{user_twf:.2f} L/kg", 
               delta=f"{metric_passbook['twf_variance']:.2f} L/kg vs Benchmark Standard (9.0)", delta_color="inverse")
+
+st.markdown("---")
+
+# User Input for Custom DPR Formats
+st.header("📋 DPR Report Format Optimization Lab")
+st.write("Customize your final document index or structure using open internet search-optimized intelligence context.")
+
+user_format_input = st.text_area(
+    "Custom DPR Report Layout Format Instructions (Optional)",
+    placeholder="Example:\nChapter 1: Sourcing Dynamics\nChapter 2: Quality Testing Framework\nChapter 3: Cold Chain Logistics\n\nLeave empty to automatically apply the standard 16-chapter corporate template.",
+    height=150,
+    help="Paste custom chapter layout indices or specific template guidelines here to rewrite document chapter blocks via Groq AI."
+)
 
 st.markdown("---")
 
@@ -579,16 +533,26 @@ else:
 # =============================================================================
 st.markdown("---")
 st.subheader("💾 Institutional Compilation Node")
-st.write("Compile all configuration parameters, financial matrices, and water-nexus charts into a multi-chapter detailed institutional project layout:")
+st.write("Compile all configuration parameters, financial matrices, and water-nexus charts into a structured institutional report document:")
 
 if st.button("Generate & Optimize Structural DPR Report Document"):
-    with st.spinner("Executing layout compilation, rendering vector image components, and optimizing narrative structures..."):
-        generated_pdf_stream = compile_comprehensive_pdf()
+    with st.spinner("Executing structural index parsing, running Groq text generation nodes, and rendering vector components..."):
         
-        st.success("Institutional Detailed Project Report generated successfully!")
+        # Check if the process needs a custom format build or a standard bypass run
+        optimized_narrative_layer = None
+        if user_format_input.strip() != "":
+            if not groq_api_key:
+                st.error("🔒 Groq API Key required to process custom layout formats. Please insert an API key or clear the custom layout area to use the default corporate blueprint.")
+            else:
+                optimized_narrative_layer = generate_custom_dpr_narrative(user_format_input)
+        
+        # Generate the ReportLab PDF
+        generated_pdf_stream = compile_comprehensive_pdf(custom_narrative_text=optimized_narrative_layer)
+        
+        st.success("DPR Compilation Complete!")
         st.download_button(
-            label="Download Elaborative Corporate DPR PDF Asset",
+            label="Download Elaborative Optimized DPR PDF Asset",
             data=generated_pdf_stream,
-            file_name="Mega_Dairy_Processing_Plant_Elaborative_DPR.pdf",
+            file_name="Mega_Dairy_Processing_Plant_Optimized_DPR.pdf",
             mime="application/pdf"
         )
