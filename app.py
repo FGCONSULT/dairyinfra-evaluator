@@ -8,7 +8,7 @@ from groq import Groq
 
 # ReportLab Layout & Presentation Engines
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
@@ -55,7 +55,6 @@ uploaded_social_file = st.sidebar.file_uploader("Upload External Social Impact R
 # =============================================================================
 # DYNAMIC SMART FALLBACK ENGINE (BYPASS LOGIC CONTROLLER)
 # =============================================================================
-# Enforcing strict defaults if user inputs are empty to preserve code integrity
 final_promoter = promoter_name if promoter_name.strip() != "" else "National Dairy Development Alliance Corp."
 final_exp = promoter_exp if promoter_exp.strip() != "" else "Over 25 years of multi-state livestock management, commercial cooperative aggregation, and bulk fluid logistics deployment."
 final_location = location if location.strip() != "" else "Amritsar-Ludhiana Agro-Industrial Corridor, Punjab, India"
@@ -76,12 +75,18 @@ actual_lpd = final_actual_llpd * 100000
 DWU_BENCHMARK = 3.31
 TWF_BENCHMARK = 9.0
 
-# Mathematical scaling indicators
-user_dwu = final_annual_water_l / final_milk_kg if (final_annual_milk_kg > 0) else 3.31
+# Mathematical scaling indicators (FIXED: final_milk_kg typo resolved to final_annual_milk_kg)
+user_dwu = final_annual_water_l / final_annual_milk_kg if (final_annual_milk_kg > 0) else 3.31
 indirect_wf = (final_annual_elec_kwh * 56.9) / final_annual_milk_kg
 user_twf = user_dwu + (indirect_wf * 0.1)
 daily_effluent_lpd = (final_annual_water_l / 365) * 0.74
 capacity_utilization = (actual_lpd / capacity_lpd) * 100 if capacity_lpd > 0 else 85.0
+
+# FIXED: Explicit definition of the metric passbook dictionary to prevent downstream KeyError/NameError
+metric_passbook = {
+    'dwu_variance': user_dwu - DWU_BENCHMARK,
+    'twf_variance': user_twf - TWF_BENCHMARK
+}
 
 # =============================================================================
 # 10-YEAR MULTI-VARIABLE CASHFLOW CORE MATH MODEL
@@ -95,8 +100,8 @@ interest_rate = 0.095
 annual_repayment = term_loan_principal / 10
 
 # Dynamic 10-year loops
-revenue_year_1 = (actual_lpd * 365) * 48.0 # Base sale rate realization per Liter
-variable_cost_year_1 = (actual_lpd * 365) * 36.5 # Raw milk collection costs
+revenue_year_1 = (actual_lpd * 365) * 48.0 
+variable_cost_year_1 = (actual_lpd * 365) * 36.5 
 staff_cost_year_1 = capex_total_inr * 0.04
 other_exp_year_1 = capex_total_inr * 0.03
 
@@ -106,9 +111,9 @@ staff_projections = [staff_cost_year_1 * (1.05 ** (y-1)) for y in years]
 other_projections = [other_exp_year_1 * (1.03 ** (y-1)) for y in years]
 
 depreciation_schedule = []
-current_asset_value = capex_total_inr * 0.75 # Plant & machinery block allocation
+current_asset_value = capex_total_inr * 0.75 
 for y in years:
-    dep_val = current_asset_value * 0.15 # WDV methodology allocation
+    dep_val = current_asset_value * 0.15 
     depreciation_schedule.append(dep_val)
     current_asset_value -= dep_val
 
@@ -126,11 +131,10 @@ for i, y in enumerate(years):
     ebitda = revenue_projection[i] - (variable_projections[i] + staff_projections[i] + other_projections[i])
     ebit = ebitda - depreciation_schedule[i]
     pbt = ebit - interest_payments[i]
-    pat = pbt * 0.75 # 25% Tax rate application
+    pat = pbt * 0.75 
     pbt_projection.append(pbt)
     net_profit_projection.append(pat)
     
-    # DSCR = (PAT + Depreciation + Interest) / (Principal Repayment + Interest)
     numerator = pat + depreciation_schedule[i] + interest_payments[i]
     denominator = annual_repayment + interest_payments[i]
     dscr_projection.append(numerator / denominator if denominator > 0 else 1.5)
@@ -142,20 +146,16 @@ def generate_advanced_topology(selected_products):
     fig, ax = plt.subplots(figsize=(12, 4.5))
     ax.axis('off')
     
-    # Layered Flow Coordinate Map
     box_props = dict(boxstyle='round,pad=0.5', facecolor='#0F172A', edgecolor='#38BDF8', lw=1.5)
     w_props = dict(boxstyle='round,pad=0.5', facecolor='#1E293B', edgecolor='#F43F5E', lw=1.5)
     
-    # Row 1: Core Dairy Refining Node Tracks
     ax.text(1, 3, "Bulk Silos Intake\n(100 LLPD Rated)", **box_props, color='white', ha='center', weight='bold')
     ax.text(4, 3, "Clarification &\nBactofugation", **box_props, color='white', ha='center', weight='bold')
     ax.text(7, 3, "High-Capacity\nPasteurization", **box_props, color='white', ha='center', weight='bold')
     
-    # Flow link elements Row 1
     ax.annotate('', xy=(2.3, 3), xytext=(1.8, 3), arrowprops=dict(arrowstyle="-|>", color='#38BDF8', lw=2))
     ax.annotate('', xy=(5.3, 3), xytext=(4.8, 3), arrowprops=dict(arrowstyle="-|>", color='#38BDF8', lw=2))
     
-    # Multi-product processing branches
     ax.text(10, 4, "Packaging Unit\n(Fluid Milk Lines)", **box_props, color='white', ha='center')
     ax.text(10, 3, "Cheese & Paneer\nCoagulation Vats", **box_props, color='white', ha='center')
     ax.text(10, 2, "By-Product Lines\n(Ghee / Mawa Pans)", **box_props, color='white', ha='center')
@@ -164,7 +164,6 @@ def generate_advanced_topology(selected_products):
     ax.annotate('', xy=(8.5, 3.0), xytext=(7.8, 3.0), arrowprops=dict(arrowstyle="-|>", color='#0EA5E9', lw=1.5))
     ax.annotate('', xy=(8.5, 2.2), xytext=(7.8, 2.8), arrowprops=dict(arrowstyle="-|>", color='#0EA5E9', lw=1.5))
     
-    # Row 2: Shared Resource Water Processing Infrastructure Line
     ax.text(4, 0.8, "Groundwater Intake\n(Empirical Sourcing)", **w_props, color='white', ha='center')
     ax.text(7, 0.8, "K-Pack Systems CFS\nHigh-Fat Interceptor", **w_props, color='white', ha='center', weight='bold')
     ax.text(10, 0.8, "Anaerobic Digester\n(Biological Secondary)", **w_props, color='white', ha='center')
@@ -172,7 +171,6 @@ def generate_advanced_topology(selected_products):
     ax.annotate('', xy=(5.5, 0.8), xytext=(4.8, 0.8), arrowprops=dict(arrowstyle="-|>", color='#F43F5E', lw=2))
     ax.annotate('', xy=(8.5, 0.8), xytext=(7.8, 0.8), arrowprops=dict(arrowstyle="-|>", color='#F43F5E', lw=2))
     
-    # Inter-layer industrial link mapping
     ax.annotate('Wastewater\nDischarge', xy=(4, 1.4), xytext=(4, 2.5),
                 arrowprops=dict(arrowstyle="->", color='#EF4444', lw=1.5, linestyle=':'), ha='center', color='#EF4444', fontSize=9)
     
@@ -185,12 +183,11 @@ def generate_compliance_matrix():
     categories = ['Financial Viability\n(CAPEX Target)', 'Direct Water Use\n(DWU Ratio)', 'Energy Footprint\n(TWF Index)', 'Social Inclusion\n(Smallholders)']
     standards = [1.0, 1.0, 1.0, 1.0]
     
-    # Normalized structural performance mappings
     real_scores = [
         min(1.3, final_capex_cr / 200.0),
         max(0.2, 1.0 - ((user_dwu - DWU_BENCHMARK) / DWU_BENCHMARK)),
         max(0.2, 1.0 - ((user_twf - TWF_BENCHMARK) / TWF_BENCHMARK)),
-        1.25 # Integrated cooperative tracking score
+        1.25 
     ]
     
     x = np.arange(len(categories))
@@ -217,7 +214,6 @@ def compile_comprehensive_pdf():
     
     styles = getSampleStyleSheet()
     
-    # Custom Corporate Palette Implementation Styles
     title_style = ParagraphStyle('CoverTitle', fontSize=26, leading=32, textColor=colors.HexColor('#0F172A'), alignment=1, spaceAfter=20, fontName="Helvetica-Bold")
     subtitle_style = ParagraphStyle('CoverSub', fontSize=14, leading=18, textColor=colors.HexColor('#475569'), alignment=1, spaceAfter=200)
     meta_style = ParagraphStyle('CoverMeta', fontSize=11, leading=15, textColor=colors.HexColor('#1E293B'), alignment=1)
@@ -426,17 +422,17 @@ st.write(f"Pre-treatment engineering scale targets computed for an estimated vol
 env_c1, env_c2 = st.columns(2)
 with env_c1:
     st.markdown("""
-    **Computed Wastewater Parameters:**
-    * **Solids Concentration Range:** 0.1% - 0.8% Dry Matter
-    * **Fat, Oil & Grease (FOG) Presence:** Very High Load Profile Expected
+    **Unstructured Wastewater Parameters:**
+    * **Solids Concentration Range:** 0.1% to 0.8% Dry Matter
+    * **Fat, Oil and Grease (FOG) Presence:** Very High Load Profile Expected
     * **Downstream Integration Core:** Pre-treatment via Cross Flow Separator (CFS) mandatory before biological anaerobic loops.
     """)
 with env_c2:
     st.markdown("""
     **Guaranteed Pre-Treatment System Performance Metrics:**
-    * **Total Suspended Solids (TSS) Reduction:** $>90\%$ System Clean Efficiency
-    * **Oil & Grease Extraction Efficiency:** $>90\%$ Separation
-    * **Sludge Solid Concentration Matrix:** Thickened to $1\% - 3\%$ Extracted Dry Cake Solids
+    * **Total Suspended Solids (TSS) Reduction:** Greater than 90% System Clean Efficiency
+    * **Oil and Grease Extraction Efficiency:** Greater than 90% Separation
+    * **Sludge Solid Concentration Matrix:** Thickened to 1% to 3% Extracted Dry Cake Solids
     """)
 
 st.markdown("---")
