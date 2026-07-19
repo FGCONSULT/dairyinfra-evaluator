@@ -224,6 +224,14 @@ def generate_custom_dpr_narrative(format_blueprint):
         return None
         
     try:
+   def generate_custom_dpr_narrative(format_blueprint):
+    """Uses Groq AI to read the user-specified formatting/indexing layout from text or PDF,
+    optimizes it using external open-source intelligence, and returns structural paragraphs.
+    """
+    if not groq_api_key:
+        return None
+        
+    try:
         client = Groq(api_key=groq_api_key)
         prompt = f"""
         You are an elite institutional consultant specializing in mega-scale dairy processing infrastructures.
@@ -246,7 +254,7 @@ def generate_custom_dpr_narrative(format_blueprint):
         """
         response = client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
-            model="llama-3.1-70b-versatile",
+            model="llama-3.3-70b-versatile",  # Updated to the active Llama 3.3 model
             max_tokens=3500,
             temperature=0.2
         )
@@ -557,7 +565,7 @@ if uploaded_social_file is not None:
                         {"role": "system", "content": "You are an expert dairy industry infrastructure consultant. Analyze the text provided, extract specific social/livelihood compliance metrics, and contrast them with baseline regional cooperative frameworks."},
                         {"role": "user", "content": f"Extract social metrics and generate a comparative vector framework for this text:\n\n{raw_text[:4000]}"}
                     ],
-                    model="llama-3.1-70b-versatile",
+                    model="llama-3.3-70b-versatile",  # Updated to the active Llama 3.3 model
                 )
             st.success("Analysis complete via Groq Processing Node!")
             st.write(inference_execution.choices[0].message.content)
