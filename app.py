@@ -217,15 +217,6 @@ def generate_compliance_matrix():
 # =============================================================================
 def generate_custom_dpr_narrative(format_blueprint):
     """Uses Groq AI to read the user-specified formatting/indexing layout from text or PDF,
-
-    optimizes it using external open-source intelligence, and returns structural paragraphs.
-    """
-    if not groq_api_key:
-        return None
-        
-    try:
-   def generate_custom_dpr_narrative(format_blueprint):
-    """Uses Groq AI to read the user-specified formatting/indexing layout from text or PDF,
     optimizes it using external open-source intelligence, and returns structural paragraphs.
     """
     if not groq_api_key:
@@ -254,7 +245,7 @@ def generate_custom_dpr_narrative(format_blueprint):
         """
         response = client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
-            model="llama-3.3-70b-versatile",  # Updated to the active Llama 3.3 model
+            model="llama-3.3-70b-versatile",
             max_tokens=3500,
             temperature=0.2
         )
@@ -262,7 +253,6 @@ def generate_custom_dpr_narrative(format_blueprint):
     except Exception as e:
         st.warning(f"Groq Optimization Engine could not complete format indexing: {str(e)}. Activating localized corporate template engine...")
         return None
-
 # =============================================================================
 # INSTITUTIONAL PDF GENERATION PROTOCOL
 # =============================================================================
